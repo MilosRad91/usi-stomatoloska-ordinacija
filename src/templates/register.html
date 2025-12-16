@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registracija</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Registracija pacijenta</h1>
+        <span class="text-danger fs-5">{{greska}}</span>
+        <form action="" method="post">
+
+            <p>
+                Unesite username:
+                <input type="text" name="username" id="">
+            </p>
+            <p>
+                Unesite password:
+                <input type="password" name="password" id="">
+            </p>
+            <p>
+                Unesite password ponovo:
+                <input type="password" name="password_again" id="">
+            </p>
+            <hr>
+            <p>
+                Unesite Ime:
+                <input type="text" name="ime" id="">
+            </p>
+            <p>
+                Unesite Prezime:
+                <input type="text" name="prezime" id="">
+            </p>
+            <p>
+                Unesite broj telefona:
+                <input type="number" name="broj_telefona" id="">
+            </p>
+            <p>
+                Unesite datum rodjenja:
+                <input type="date" name="datum_rodjenja" id="">
+            </p>
+            <p>
+                Unesite adresu:
+                <input type="text" name="adresa" id="">
+            </p>
+            <p>
+                Unesite grad:
+                <input type="text" name="grad" id="">
+            </p>
+            <p>
+                Unesite alergije(ako ste alergicni):
+                <input type="text" name="alergije" id="">
+            </p>
+            <p>
+                <button type="submit" class="btn btn-primary">Registruj se</button>
+            </p>
+
+        </form>
+        <a href="login"><button class="btn btn-danger">Nazad</button></a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

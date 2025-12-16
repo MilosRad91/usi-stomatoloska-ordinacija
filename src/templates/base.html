@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Stomatološka ordinacija{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- GLOBALNI HEADER - SVUDA SE PRIKAZUJE -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="https://cdn-icons-png.flaticon.com/512/1005/1005738.png" width="40" height="40" class="me-2">
+                <span class="fs-4 fw-bold">Stomatološka ordinacija <span class="text-warning">Zdrav Osmeh</span></span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            {% if 'role' in session %}
+            {% if session['role'] == 'pacijent' %}
+            <div class="collapse navbar-collapse" id="navMenu">
+
+                <!-- Centrirane stavke -->
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="/profil">Moj profil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/zakazivanja">Zakazivanje termina</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/pocetna_stranica">Cenovnik usluga</a></li>
+                </ul>
+
+                <!-- Logout skroz desno -->
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-warning fw-bold" href="/logout">Logout</a>
+                    </li>
+                </ul>
+
+            </div>
+            {% endif %}
+            {% if session['role'] == 'stomatolog' %}
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/pocetna_stranica">Početna</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/profil">MUNEM</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/zakazivanja">DOBRO</a></li>
+                    <li class="nav-item"><a class="nav-link text-warning fw-bold" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- OVDE IDE SADRŽAJ KOJI SE MENJA -->
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
