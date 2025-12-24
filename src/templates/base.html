@@ -29,7 +29,7 @@
                 <!-- Centrirane stavke -->
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link" href="/profil">Moj profil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/zakazivanja">Zakazivanje termina</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/zakazi_termin">Zakazivanje termina</a></li>
                     <li class="nav-item"><a class="nav-link" href="/pocetna_stranica">Cenovnik usluga</a></li>
                 </ul>
 
@@ -47,7 +47,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="/pocetna_stranica">Početna</a></li>
                     <li class="nav-item"><a class="nav-link" href="/profil">MUNEM</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/zakazivanja">DOBRO</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/zakazi_termin">DOBRO</a></li>
                     <li class="nav-item"><a class="nav-link text-warning fw-bold" href="/logout">Logout</a></li>
                 </ul>
             </div>
@@ -58,7 +58,28 @@
 
     <!-- OVDE IDE SADRŽAJ KOJI SE MENJA -->
     <div class="container mt-4">
-        {% block content %}{% endblock %}
+        {% block content %}
+            
+            <h2>Dobrodošli, {{ user }}!</h2>
+            <p>Vaša uloga: <b>{{ role }}</b></p>
+            
+            {% if session['role'] == 'pacijent' %}
+            <h2 class="text-center">Vaši termini</h2>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Datum</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+            </table>
+
+            {% endif %}
+        
+        {% endblock %}
+        
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>

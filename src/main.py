@@ -133,10 +133,61 @@ def logout():
 
 @app.route('/zakazi_termin', methods=['GET', 'POST'])
 def zakazi_termin():
-	if request.method == "GET":
-		return render_template('zakazi_termin.html')
-	if request.method == "POST":
-		pass
+	if 'user_id' not in session or session['role'] != 'pacijent':
+		return redirect(url_for('login'))
+	
+	pacijent = Pacijent.query.filter_by(korisnikID=session['user_id']).first()
+	stomatolozi = Stomatolog.query.all()
+	
+	if request.method == 'GET':
+		return render_template(
+            'zakazi_termin.html',
+            stomatolozi=stomatolozi,
+			zauzeti_sati = []
+        )
+	
+	if request.method == 'POST':
+		datum_str = request.form['datum']
+		vreme = int(request.form['vreme'])
+		stomatolog_id = request.form['stomatolog']
+
+		datum_obj = datetime.strptime(datum_str, "%Y-%m-%d")
+		pocetak_dana = datum_obj.replace(hour=0, minute=0, second=0)
+		kraj_dana = datum_obj.replace(hour=23, minute=59, second=59)
+
+		termini_na_datum = Termin.query.filter(
+        	Termin.stomatologID==stomatolog_id,
+        	Termin.status == 'zakazan',
+    		Termin.datum >= pocetak_dana,
+    		Termin.datum <= kraj_dana
+    	).all()
+
+		zauzeti_sati = [t.datum.hour for t in termini_na_datum]
+
+		if vreme in zauzeti_sati:
+			return render_template(
+            	'zakazi_termin.html',
+            	stomatolozi=stomatolozi,
+            	greska="Izabrani termin je već zauzet. Molimo izaberite drugi termin.",
+            	zauzeti_sati=zauzeti_sati
+        	)
+
+		datum = datum_obj.replace(hour=vreme, minute=0, second=0)
+		
+		novi_termin = Termin(
+        	datum=datum,
+        	status='zakazan',
+        	pacijentID=pacijent.idPacijent,
+        	stomatologID=stomatolog_id
+    	)
+
+		db.session.add(novi_termin)
+		db.session.commit()
+
+		return redirect(url_for('pocetna_stranica'))
+
+
+	
 if __name__ == '__main__':
     app.run(debug=True)
     
