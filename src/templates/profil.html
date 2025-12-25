@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2>Moj profil</h2>
+    <hr>
+
+
+    <!-- PACIJENT -->
+    {% if pacijent %}
+    <div class="card mb-3 border-primary">
+        <div class="card-body">
+            <h5 class="card-title">Podaci o pacijentu</h5>
+            <hr>
+            <p><strong>Uloga:</strong> {{ korisnik.uloga | capitalize }}</p>
+            <p><strong>Korisničko ime:</strong> {{ korisnik.username }}</p>
+            <p><strong>Ime:</strong> {{ pacijent.ime }}</p>
+            <p><strong>Prezime:</strong> {{ pacijent.prezime }}</p>
+            <p><strong>Datum rodjenja:</strong> {{ pacijent.datum_rodjenja.strftime('%d-%m-%Y') }}</p>
+            <p><strong>Broj telefona:</strong> {{ pacijent.broj_telefona }}</p>
+            <p><strong>Adresa:</strong> {{ pacijent.adresa }}</p>
+            <p><strong>Grad:</strong> {{ pacijent.grad }}</p>
+            <p><strong>Alergije:</strong> {{ pacijent.alergije }}</p>
+        </div>
+    </div>
+    <a href="pocetna_stranica"><button class="btn btn-danger">Nazad</button></a>
+    <a href="izmeni_profil"><button class="btn btn-success">Izmeni podatke</button></a>
+    {% endif %}
+
+    <!-- STOMATOLOG -->
+    {% if stomatolog %}
+    <div class="card mb-3 border-success">
+        <div class="card-body">
+            <h5 class="card-title">Podaci o stomatologu</h5>
+            <p><strong>Ime:</strong> {{ stomatolog.ime }}</p>
+            <p><strong>Prezime:</strong> {{ stomatolog.prezime }}</p>
+            <p><strong>Broj telefona:</strong> {{ stomatolog.broj_telefona }}</p>
+        </div>
+    </div>
+    <a href="pocetna_stranica"><button class="btn btn-danger">Nazad</button></a>
+    <a href="izmeni_profil"><button class="btn btn-success">Izmeni podatke</button></a>
+    {% endif %}
+
+    <!-- SESTRA -->
+    {% if sestra %}
+    <div class="card mb-3 border-warning">
+        <div class="card-body">
+            <h5 class="card-title">Podaci o stomatološkoj sestri</h5>
+            <p><strong>Ime:</strong> {{ sestra.ime }}</p>
+            <p><strong>Prezime:</strong> {{ sestra.prezime }}</p>
+            <p><strong>Broj telefona:</strong> {{ stomatolog.broj_telefona }}</p>
+        </div>
+    </div>
+    <a href="pocetna_stranica"><button class="btn btn-danger">Nazad</button></a>
+    <a href="izmeni_profil"><button class="btn btn-success">Izmeni podatke</button></a>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2>Izmena profila</h2>
+    <form method="POST">
+
+        <!-- OSNOVNI PODACI -->
+        <div class="mb-3">
+            <label class="form-label">Korisničko ime</label>
+            <input type="text" name="username" class="form-control" value="{{ korisnik.username }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Nova lozinka (ostavi prazno ako ne menjaš)</label>
+            <input type="password" name="password" class="form-control">
+        </div>
+
+        <!-- PODACI SPECIFIČNI ZA ULOGU -->
+        {% if spec %}
+            <div class="mb-3">
+                <label class="form-label">Ime</label>
+                <input type="text" name="ime" class="form-control" value="{{ spec.ime }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Prezime</label>
+                <input type="text" name="prezime" class="form-control" value="{{ spec.prezime }}">
+            </div>
+            <div class="mb-3">
+                    <label class="form-label">Broj telefona</label>
+                    <input type="text" name="broj_telefona" class="form-control" value="{{ spec.broj_telefona }}">
+                </div>
+
+            {% if korisnik.uloga == 'pacijent' %}
+
+                <div class="mb-3">
+                    <label class="form-label">Datum rođenja</label>
+                    <input type="date" name="datum_rodjenja" class="form-control" value="{{ spec.datum_rodjenja.strftime('%Y-%m-%d') }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Adresa</label>
+                    <input type="text" name="adresa" class="form-control" value="{{ spec.adresa }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Grad</label>
+                    <input type="text" name="grad" class="form-control" value="{{ spec.grad }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Alergije</label>
+                    <input type="text" name="alergije" class="form-control" value="{{ spec.alergije }}">
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <button class="btn btn-primary">Sačuvaj izmene</button>
+    </form>
+</div>
+
+{% endblock %}

@@ -67,7 +67,24 @@ def login():
 def pocetna_stranica():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template("pocetna_stranica.html", user=session['username'], role=session['role'], id=session['user_id'])
+	
+    pacijent = Pacijent.query.filter_by(korisnikID = session['user_id']).first()
+	
+    if pacijent:
+        termini = Termin.query.filter_by(pacijentID=pacijent.idPacijent).order_by(Termin.datum.asc()).all()
+	
+        return render_template("pocetna_stranica.html", 
+						   user=session['username'], 
+						   role=session['role'], 
+						   id=session['user_id'], 
+						   termini=termini
+						   )
+	
+    return render_template("pocetna_stranica.html",
+						user=session['username'], 
+						role=session['role'], 
+						id=session['user_id']
+						)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -174,6 +191,7 @@ def zakazi_termin():
 
 		datum = datum_obj.replace(hour=vreme, minute=0, second=0)
 		
+		
 		novi_termin = Termin(
         	datum=datum,
         	status='zakazan',
@@ -187,7 +205,102 @@ def zakazi_termin():
 		return redirect(url_for('pocetna_stranica'))
 
 
+@app.route('/otkazi_termin/<int:termin_id>', methods=['POST'])
+def otkazi_termin(termin_id):
+	if 'user_id' not in session or session['role'] != 'pacijent':
+		return redirect(url_for('login'))
 	
+	pacijent = Pacijent.query.filter_by(korisnikID=session['user_id']).first()
+
+	termin = Termin.query.filter_by(
+        idTermin=termin_id,
+        pacijentID=pacijent.idPacijent
+    ).first()
+
+	if not termin:
+		return redirect(url_for('pocetna_stranica'))
+	
+	termin.status = 'otkazan'
+	db.session.commit()
+
+	return redirect(url_for('pocetna_stranica'))
+
+@app.route('/profil')
+def profil():
+	if 'user_id' not in session:
+		return redirect(url_for('login'))
+	
+	korisnik = Korisnik.query.get(session['user_id'])
+
+	pacijent = None
+	stomatolog = None
+	sestra = None
+
+	if not korisnik:
+		return redirect(url_for('login'))
+	
+	if korisnik.uloga == 'pacijent':
+		pacijent = Pacijent.query.filter_by(korisnikID=korisnik.idKorisnici).first()
+	
+	elif korisnik.uloga == 'stomatolog':
+		stomatolog = Stomatolog.query.filter_by(korisnikID=korisnik.idKorisnici).first()
+
+	elif korisnik.uloga == 'sestra':
+		sestra = StomatoloskaSestra.query.filter_by(korisnikID=korisnik.idKorisnici).first()
+	
+	return render_template(
+        'profil.html',
+        korisnik=korisnik,
+        pacijent=pacijent,
+        stomatolog=stomatolog,
+        sestra=sestra
+    )
+
+@app.route('/izmeni_profil', methods=['GET', 'POST'])
+def izmeni_profil():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    korisnik = Korisnik.query.get(session['user_id'])
+    if not korisnik:
+        return redirect(url_for('login'))
+
+    if korisnik.uloga == 'pacijent':
+        spec = Pacijent.query.filter_by(korisnikID=korisnik.idKorisnici).first()
+    elif korisnik.uloga == 'stomatolog':
+        spec = Stomatolog.query.filter_by(korisnikID=korisnik.idKorisnici).first()
+    elif korisnik.uloga == 'sestra':
+        spec = StomatoloskaSestra.query.filter_by(korisnikID=korisnik.idKorisnici).first()
+    else:
+        spec = None
+
+    if request.method == 'POST':
+        # Osnovni podaci
+        korisnik.username = request.form['username']
+        if 'password' in request.form and request.form['password']:
+            korisnik.password = request.form['password']
+
+        # Podaci specifični za ulogu
+        if spec:
+            spec.ime = request.form.get('ime', spec.ime)
+            spec.prezime = request.form.get('prezime', spec.prezime)
+            if korisnik.uloga == 'pacijent':
+                spec.broj_telefona = request.form.get('broj_telefona', spec.broj_telefona)
+                datum_rodjenja = request.form.get('datum_rodjenja')
+                if datum_rodjenja:
+                    spec.datum_rodjenja = datetime.strptime(datum_rodjenja, "%Y-%m-%d")
+                spec.adresa = request.form.get('adresa', spec.adresa)
+                spec.grad = request.form.get('grad', spec.grad)
+                spec.alergije = request.form.get('alergije', spec.alergije)
+
+        db.session.commit()
+        return redirect(url_for('profil'))
+
+    return render_template('izmeni_profil.html', korisnik=korisnik, spec=spec)
+
+	
+
+
 if __name__ == '__main__':
     app.run(debug=True)
     
