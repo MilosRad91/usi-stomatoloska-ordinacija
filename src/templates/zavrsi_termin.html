@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Završi termin: {{ termin.datum.strftime('%d-%m-%Y %H:%M') }}</h2>
+
+<form method="POST">
+    <div class="mb-3">
+        <label class="form-label">Naziv intervencije</label>
+        <input type="text" name="naziv" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Opis intervencije</label>
+        <textarea name="opis" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Cena</label>
+        <input type="number" step="0.01" name="cena" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Asistirala sestra</label>
+        <select name="sestra" class="form-select" required>
+            {% for s in sestre %}
+                <option value="{{ s.idStomatoloskaSestra }}">{{ s.ime }} {{ s.prezime }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button class="btn btn-success">Sačuvaj intervenciju</button>
+</form>
+
+{% endblock %}

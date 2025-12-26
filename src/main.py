@@ -67,24 +67,35 @@ def login():
 def pocetna_stranica():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-	
-    pacijent = Pacijent.query.filter_by(korisnikID = session['user_id']).first()
-	
-    if pacijent:
-        termini = Termin.query.filter_by(pacijentID=pacijent.idPacijent).order_by(Termin.datum.asc()).all()
-	
-        return render_template("pocetna_stranica.html", 
-						   user=session['username'], 
-						   role=session['role'], 
-						   id=session['user_id'], 
-						   termini=termini
-						   )
-	
-    return render_template("pocetna_stranica.html",
-						user=session['username'], 
-						role=session['role'], 
-						id=session['user_id']
-						)
+
+    termini = []
+
+    if session['role'] == 'pacijent':
+        pacijent = Pacijent.query.filter_by(
+            korisnikID=session['user_id']
+        ).first()
+
+        termini = Termin.query.filter_by(
+            pacijentID=pacijent.idPacijent
+        ).order_by(Termin.datum.asc()).all()
+
+    elif session['role'] == 'stomatolog':
+        stomatolog = Stomatolog.query.filter_by(
+            korisnikID=session['user_id']
+        ).first()
+
+        termini = Termin.query.filter(
+            Termin.stomatologID == stomatolog.idStomatolog,
+            Termin.status == 'zakazan'   # 👈 KLJUČNA LINIJA
+        ).order_by(Termin.datum.asc()).all()
+
+    return render_template(
+        "pocetna_stranica.html",
+        user=session['username'],
+        role=session['role'],
+        id=session['user_id'],
+        termini=termini
+    )
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -225,6 +236,21 @@ def otkazi_termin(termin_id):
 
 	return redirect(url_for('pocetna_stranica'))
 
+@app.route('/stomatolog/otkazi_termin/<int:termin_id>', methods=['POST'])
+def stomatolog_otkazi_termin(termin_id):
+    if 'user_id' not in session or session['role'] != 'stomatolog':
+        return redirect(url_for('login'))
+
+    termin = Termin.query.get(termin_id)
+
+    if not termin:
+        return redirect(url_for('pocetna_stranica'))
+
+    termin.status = 'otkazan'
+    db.session.commit()
+
+    return redirect(url_for('pocetna_stranica'))
+
 @app.route('/profil')
 def profil():
 	if 'user_id' not in session:
@@ -299,6 +325,51 @@ def izmeni_profil():
     return render_template('izmeni_profil.html', korisnik=korisnik, spec=spec)
 
 	
+@app.route('/cenovnik')
+def cenovnik():
+	return render_template('cenovnik.html',user=session['username'], role=session['role'])
+
+@app.route('/zavrsi_termin/<int:termin_id>', methods=['GET', 'POST'])
+def zavrsi_termin(termin_id):
+    if 'user_id' not in session or session['role'] != 'stomatolog':
+        return redirect(url_for('login'))
+
+    termin = Termin.query.get(termin_id)
+    if not termin or termin.status != 'zakazan':
+        return redirect(url_for('pocetna_stranica'))
+
+    # Dohvati sve sestre da ih prikažemo u dropdown-u
+    sestre = StomatoloskaSestra.query.all()
+
+    if request.method == 'GET':
+        return render_template('zavrsi_termin.html', termin=termin, sestre=sestre)
+
+    if request.method == 'POST':
+        naziv = request.form['naziv']
+        opis = request.form['opis']
+        cena = request.form['cena']
+        sestra_id = request.form['sestra']  # ID iz dropdown-a
+
+        if sestra_id == '' or sestra_id is None:
+            sestra_id = None
+        else:
+            sestra_id = int(sestra_id)
+
+        nova_intervencija = Intervencija(
+            naziv=naziv,
+            opis=opis,
+            cena=cena,
+            terminID=termin.idTermin,
+            stomatologID=termin.stomatologID,
+            stomatoloskaSestraID=sestra_id
+        )
+
+        db.session.add(nova_intervencija)
+        termin.status = 'realizovan'
+        db.session.commit()
+
+        return redirect(url_for('pocetna_stranica'))
+
 
 
 if __name__ == '__main__':
